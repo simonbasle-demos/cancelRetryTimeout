@@ -1,9 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
 
 <FlowPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
           minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="org.example.FXMLController">
+   <children>
+      <RadioButton fx:id="typeBlocking" mnemonicParsing="false" text="Blocking">
+         <toggleGroup>
+            <ToggleGroup fx:id="type" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="typeFuture" mnemonicParsing="false" text="Futures" toggleGroup="$type" />
+      <RadioButton fx:id="typeFlux" mnemonicParsing="false" text="Flux" toggleGroup="$type" />
+      <Button fx:id="makeButton" mnemonicParsing="false" text="Make Request" />
+      <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel Current Request" />
+      <VBox fx:id="progressBox" alignment="TOP_CENTER" prefHeight="286.0"
+            prefWidth="600.0"/>
+   </children>
 </FlowPane>
