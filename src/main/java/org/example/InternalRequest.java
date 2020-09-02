@@ -25,9 +25,10 @@ class InternalRequest extends AtomicBoolean
 	private final String id;
 	private final Duration stepDuration;
 
-	private final StackPane guiContainer;
 	private final ProgressBar bar;
 	private final Text text;
+
+	private StackPane guiContainer;
 
 	public InternalRequest(String id, Duration duration) {
 		this.id = id;
@@ -35,19 +36,18 @@ class InternalRequest extends AtomicBoolean
 
 		this.bar = new ProgressBar();
 		this.text = new Text("0%");
-		this.guiContainer = new StackPane(bar, text);
-
-		bar.setMaxWidth(Double.MAX_VALUE);
 	}
 
 	@Override
 	public void showOn(Pane gui) {
+		this.guiContainer = new RequestBar(this, this.bar, this.text);
 		gui.getChildren().add(guiContainer);
 		guiContainer.setOnMouseClicked(me -> {
 			if (me.getClickCount() == 2 && bar.getProgress() == 1d) {
 				gui.getChildren().remove(guiContainer);
 			}
 		});
+		bar.setOnMouseClicked(guiContainer.getOnMouseClicked());
 	}
 
 	@Override

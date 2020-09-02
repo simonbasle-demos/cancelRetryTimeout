@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.reactivestreams.Subscription;
 
@@ -50,6 +49,10 @@ public class FXMLController implements Initializable {
 	private Button cancelButton;
 
 	@FXML
+	private Button clearButton;
+
+
+	@FXML
 	private Button makeButton;
 
 	private Client client;
@@ -61,6 +64,8 @@ public class FXMLController implements Initializable {
 		makeButton.setOnAction(this::makeRequest);
 		cancelButton.setCancelButton(true);
 		cancelButton.setOnAction(this::cancelRequest);
+		clearButton.setOnAction(this::clearDone);
+
 		typeFlux.setSelected(true);
 
 		client = new Client();
@@ -200,6 +205,11 @@ public class FXMLController implements Initializable {
 			Disposable d = (Disposable) o;
 			d.dispose();
 		}
+	}
+
+	void clearDone(ActionEvent event) {
+		progressPane.getChildren()
+		            .removeIf(node -> node instanceof RequestBar && ((RequestBar) node).isDone());
 	}
 
 }

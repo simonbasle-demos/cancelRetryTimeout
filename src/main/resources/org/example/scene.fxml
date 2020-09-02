@@ -44,6 +44,7 @@
                <children>
                   <Button fx:id="makeButton" mnemonicParsing="false" text="Make Request" />
                   <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel Current Request" />
+                  <Button fx:id="clearButton" mnemonicParsing="false" text="Clear Done" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
