@@ -31,10 +31,10 @@ import reactor.core.publisher.Mono;
 public class FXMLController implements Initializable {
 
 	@FXML
-	private RadioButton typeBlocking;
+	private ToggleGroup type;
 
 	@FXML
-	private ToggleGroup type;
+	private RadioButton typeBlocking;
 
 	@FXML
 	private RadioButton typeFuture;
