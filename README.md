@@ -1,4 +1,4 @@
-#Demo code for "Cancel, Retry and Timeouts" talk
+# Demo code for "Cancel, Retry and Timeouts" talk
 _Keep Your Sanity Thanks to Reactive Programming_
 
 Talk first given at virtual SpringOne 2020 conference.
