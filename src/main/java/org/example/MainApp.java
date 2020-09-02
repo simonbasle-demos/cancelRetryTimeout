@@ -17,12 +17,10 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		System.setProperty("prism.lcdtext", "false");
 		Parent root = FXMLLoader.load(getClass().getResource("scene.fxml"));
 
 		Scene scene = new Scene(root);
-//		scene.getStylesheets()
-//		     .add(getClass().getResource("styles.css")
-//		                    .toExternalForm());
 
 		stage.setTitle("Cancel, Retry and Timeouts");
 		stage.setScene(scene);

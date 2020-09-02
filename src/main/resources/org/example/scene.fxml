@@ -28,7 +28,7 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <RadioButton fx:id="typeFlux" mnemonicParsing="false" text="Flux">
+                  <RadioButton fx:id="typeFlux" mnemonicParsing="false" text="Reactive (Mono)">
                      <toggleGroup>
                         <ToggleGroup fx:id="type" />
                      </toggleGroup>
