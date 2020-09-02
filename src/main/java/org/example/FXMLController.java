@@ -15,7 +15,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.reactivestreams.Subscription;
 
@@ -39,7 +41,10 @@ public class FXMLController implements Initializable {
 	private RadioButton typeFlux;
 
 	@FXML
-	VBox progressBox;
+	VBox progressPane;
+
+	@FXML
+	ScrollPane scrollPane;
 
 	@FXML
 	private Button cancelButton;
@@ -112,7 +117,7 @@ public class FXMLController implements Initializable {
 	void makeRequest(ActionEvent event) {
 		if (typeFuture.isSelected()) {
 			FutureRequest futureRequest = client.futureRequest();
-			futureRequest.showOn(progressBox);
+			futureRequest.showOn(progressPane);
 			CompletableFuture<String> realWorkFuture = futureRequest
 					.exchangeFuture();
 			//we have to cheat here as CompletableFuture doesn't propagate cancel upstream
@@ -132,7 +137,7 @@ public class FXMLController implements Initializable {
 		}
 		else if (typeBlocking.isSelected()) {
 			BlockingRequest blockingRequest = client.blockingRequest();
-			blockingRequest.showOn(progressBox);
+			blockingRequest.showOn(progressPane);
 			try {
 				String response = blockingRequest.exchangeBlocking();
 				blockingRequest.guiCompleted(response);
@@ -143,7 +148,7 @@ public class FXMLController implements Initializable {
 		}
 		else {
 			ReactiveRequest reactiveRequest = client.reactiveRequest();
-			reactiveRequest.showOn(progressBox);
+			reactiveRequest.showOn(progressPane);
 			Mono<String> reactiveMono = reactiveRequest.exchangeReactive();
 
 			Disposable d = subscribeGuiToMono(reactiveMono, reactiveRequest);
