@@ -28,7 +28,7 @@ class InternalRequest extends AtomicBoolean
 	private final ProgressBar bar;
 	private final Text text;
 
-	private StackPane guiContainer;
+	private RequestBar guiContainer;
 
 	public InternalRequest(String id, Duration duration) {
 		this.id = id;
@@ -62,6 +62,12 @@ class InternalRequest extends AtomicBoolean
 
 	@Override
 	public Mono<String> exchangeReactive() {
+		return mono();
+	}
+
+	@Override
+	public Mono<String> exchangeInnerReactive() {
+		guiContainer.setInner(true);
 		return mono();
 	}
 
@@ -108,7 +114,8 @@ class InternalRequest extends AtomicBoolean
 		if (compareAndSet(false, true)) {
 			Platform.runLater(() -> {
 				bar.setProgress(1d);
-				bar.setStyle("-fx-accent: orange");
+				bar.setStyle("-fx-accent: red");
+				text.setFill(Color.BLACK);
 				text.setText(error.toString());
 
 				bar.setMinHeight(text.getBoundsInLocal().getHeight() + DEFAULT_LABEL_PADDING * 2);
@@ -128,7 +135,7 @@ class InternalRequest extends AtomicBoolean
 				text.setFill(Color.WHITE);
 			}
 			else {
-				bar.setStyle("");
+				bar.setStyle(guiContainer.getProgressStyle());
 				text.setText(progress + "%");
 				if (progress >= 50) {
 					text.setFill(Color.WHITE);

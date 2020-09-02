@@ -28,7 +28,8 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <RadioButton fx:id="typeFlux" mnemonicParsing="false" text="Reactive (Mono)">
+                  <Button fx:id="makeButton" mnemonicParsing="false" text="Simple Request" />
+                  <RadioButton fx:id="typeFlux" mnemonicParsing="false" text="Flux">
                      <toggleGroup>
                         <ToggleGroup fx:id="type" />
                      </toggleGroup>
@@ -42,9 +43,12 @@
             </HBox>
             <HBox spacing="10.0">
                <children>
-                  <Button fx:id="makeButton" mnemonicParsing="false" text="Make Request" />
+                  <Button fx:id="complexMakeButton" mnemonicParsing="false" text="Complex Request" />
                   <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel Current Request" />
-                  <Button fx:id="clearButton" mnemonicParsing="false" text="Clear Done" />
+                  <Button fx:id="clearButton" mnemonicParsing="false" text="Clear Done">
+                     <HBox.margin>
+                        <Insets left="60.0" />
+                     </HBox.margin></Button>
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

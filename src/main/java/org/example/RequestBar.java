@@ -13,6 +13,8 @@ public class RequestBar extends StackPane {
 	private final ProgressBar bar;
 	private final Text text;
 
+	private boolean isInner;
+
 	public RequestBar(InternalRequest parent, ProgressBar bar, Text text) {
 		super(bar, text);
 		this.parent = parent;
@@ -24,6 +26,21 @@ public class RequestBar extends StackPane {
 
 	public ProgressBar getBar() {
 		return bar;
+	}
+
+	public boolean isInner() {
+		return isInner;
+	}
+
+	public void setInner(boolean inner) {
+		isInner = inner;
+	}
+
+	public String getProgressStyle() {
+		if (isInner()) {
+			return "-fx-accent: mediumpurple";
+		}
+		return "";
 	}
 
 	public Text getText() {

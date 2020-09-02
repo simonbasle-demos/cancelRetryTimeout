@@ -1,10 +1,12 @@
 package org.example;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -23,6 +25,7 @@ import org.reactivestreams.Subscription;
 import reactor.core.Disposable;
 import reactor.core.Disposables;
 import reactor.core.publisher.BaseSubscriber;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class FXMLController implements Initializable {
@@ -51,9 +54,11 @@ public class FXMLController implements Initializable {
 	@FXML
 	private Button clearButton;
 
-
 	@FXML
 	private Button makeButton;
+
+	@FXML
+	private Button complexMakeButton;
 
 	private Client client;
 	private ObservableList<Object> workQueue;
@@ -65,6 +70,7 @@ public class FXMLController implements Initializable {
 		cancelButton.setCancelButton(true);
 		cancelButton.setOnAction(this::cancelRequest);
 		clearButton.setOnAction(this::clearDone);
+		complexMakeButton.setOnAction(this::makeComplexRequest);
 
 		typeFlux.setSelected(true);
 
@@ -119,45 +125,57 @@ public class FXMLController implements Initializable {
 		}
 	}
 
+	void simpleFutureRequest() {
+		FutureRequest futureRequest = client.futureRequest();
+		futureRequest.showOn(progressPane);
+		CompletableFuture<String> realWorkFuture = futureRequest
+				.exchangeFuture();
+		//we have to cheat here as CompletableFuture doesn't propagate cancel upstream
+		workQueue.add(realWorkFuture);
+		realWorkFuture.whenComplete((v, err) -> {
+			if (v != null) {
+				futureRequest.guiCompleted(v);
+			}
+			else if (err instanceof CancellationException) {
+				futureRequest.guiCancelled();
+			}
+			else if (err != null) {
+				futureRequest.guiFailed(err);
+			}
+			Platform.runLater(() -> workQueue.remove(realWorkFuture));
+		});
+	}
+
+	void simpleBlockingRequest() {
+		BlockingRequest blockingRequest = client.blockingRequest();
+		blockingRequest.showOn(progressPane);
+		try {
+			String response = blockingRequest.exchangeBlocking();
+			blockingRequest.guiCompleted(response);
+		}
+		catch (Exception e) {
+			blockingRequest.guiFailed(e);
+		}
+	}
+
+	void simpleReactiveRequest() {
+		ReactiveRequest reactiveRequest = client.reactiveRequest();
+		reactiveRequest.showOn(progressPane);
+		Mono<String> reactiveMono = reactiveRequest.exchangeReactive();
+
+		Disposable d = subscribeGuiToMono(reactiveMono, reactiveRequest);
+		workQueue.add(d);
+	}
+
 	void makeRequest(ActionEvent event) {
 		if (typeFuture.isSelected()) {
-			FutureRequest futureRequest = client.futureRequest();
-			futureRequest.showOn(progressPane);
-			CompletableFuture<String> realWorkFuture = futureRequest
-					.exchangeFuture();
-			//we have to cheat here as CompletableFuture doesn't propagate cancel upstream
-			workQueue.add(realWorkFuture);
-			realWorkFuture.whenComplete((v, err) -> {
-						if (v != null) {
-							futureRequest.guiCompleted(v);
-						}
-						else if (err instanceof CancellationException) {
-							futureRequest.guiCancelled();
-						}
-						else if (err != null) {
-							futureRequest.guiFailed(err);
-						}
-						Platform.runLater(() -> workQueue.remove(realWorkFuture));
-					});
+			simpleFutureRequest();
 		}
 		else if (typeBlocking.isSelected()) {
-			BlockingRequest blockingRequest = client.blockingRequest();
-			blockingRequest.showOn(progressPane);
-			try {
-				String response = blockingRequest.exchangeBlocking();
-				blockingRequest.guiCompleted(response);
-			}
-			catch (Exception e) {
-				blockingRequest.guiFailed(e);
-			}
+			simpleBlockingRequest();
 		}
 		else {
-			ReactiveRequest reactiveRequest = client.reactiveRequest();
-			reactiveRequest.showOn(progressPane);
-			Mono<String> reactiveMono = reactiveRequest.exchangeReactive();
-
-			Disposable d = subscribeGuiToMono(reactiveMono, reactiveRequest);
-			workQueue.add(d);
+			simpleReactiveRequest();
 		}
 	}
 
@@ -190,6 +208,30 @@ public class FXMLController implements Initializable {
 		});
 
 		return d;
+	}
+
+	void makeComplexRequest(ActionEvent event) {
+		Mono<String> complexRequest = Flux
+				.range(1, 5)
+				.flatMapDelayError(i -> decorateInnerRequest(innerRequest -> innerRequest
+//timeout of Duration.ofSeconds(i) ??
+//retry??
+						), 5, 1)
+				.collectList()
+				.map(Object::toString);
+
+		workQueue.add(complexRequest.subscribe());
+	}
+
+	Mono<String> decorateInnerRequest(Function<Mono<String>, Mono<String>> decorator) {
+		return Mono.defer(() -> {
+			ReactiveRequest innerRequest = client.reactiveRequest();
+			innerRequest.showOn(progressPane);
+			return decorator.apply(innerRequest.exchangeInnerReactive())
+			                .doOnCancel(innerRequest::guiCancelled)
+			                .doOnSuccess(innerRequest::guiCompleted)
+			                .doOnError(innerRequest::guiFailed);
+		});
 	}
 
 	void cancelRequest(ActionEvent event) {

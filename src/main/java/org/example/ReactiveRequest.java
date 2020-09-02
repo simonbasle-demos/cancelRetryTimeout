@@ -9,4 +9,6 @@ public interface ReactiveRequest extends GraphicalRequest {
 
 	Mono<String> exchangeReactive();
 
+	Mono<String> exchangeInnerReactive();
+
 }
